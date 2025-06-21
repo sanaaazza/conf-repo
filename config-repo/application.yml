@@ -1,0 +1,75 @@
+# === Configuration de base ===
+spring:
+  application:
+    name: collab-platform  # Nom général du projet
+  profiles:
+    active: dev  # Profil actif par défaut
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true  # Échoue si Config Server indisponible
+      profile: ${SPRING_PROFILES_ACTIVE:dev}
+    discovery:
+      enabled: true
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,env
+    endpoint:
+      health:
+        show-details: always
+        probes:
+          enabled: true
+
+# === Configuration Eureka commune ===
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# === Logging centralisé ===
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: WARN
+    com.yourpackage: DEBUG
+  file:
+    name: logs/collab-platform.log
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# === Profiles spécifiques ===
+---
+# Profil DEV
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    hikari:
+      maximum-pool-size: 5
+  boot:
+    admin:
+      client:
+        url: http://localhost:8088
+
+---
+# Profil PROD
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    hikari:
+      maximum-pool-size: 20
+  boot:
+    admin:
+      client:
+        url: http://prod-admin:8088

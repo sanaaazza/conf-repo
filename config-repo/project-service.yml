@@ -1,0 +1,77 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: project-service
+  cloud:
+    discovery:
+      enabled: true
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090/admin
+        instance:
+          metadata:
+            user.name: ${spring.security.user.name}
+            user.password: ${spring.security.user.password}
+  security:
+    user:
+      name: admin
+      password: admin
+  datasource:
+    url: jdbc:mysql://localhost:3306/db_project?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+    status-page-url-path: /actuator/info
+    health-check-url-path: /actuator/health
+    metadata-map:
+      management:
+        context-path: /actuator
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 30
+    instance-info-replication-interval-seconds: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+    info:
+      env:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+logging:
+  level:
+    com.netflix.eureka: OFF
+    com.netflix.discovery: OFF
+
+jwt:
+  secret: a4NKDQPRJkhiHjan7thwv2TSJVAhnwgtUs5TjFI/VpWHebkFc2m1s+GqCaLl5Q/m8CmcMWDYMNzYOEwVvX4ccA==
